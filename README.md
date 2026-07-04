@@ -29,6 +29,22 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Database Seed
+
+This project includes a Prisma seed with test data for the admin routes.
+
+1. Set `DIRECT_URL` or `DATABASE_URL` in your environment.
+2. Run `npm run db:seed`.
+
+The seed clears existing app data and recreates:
+
+- 1 admin user
+- 8 employee users with profiles
+- attendance rows for recent days
+- leave requests in pending, approved, and rejected states
+- payroll rows for the current and previous month
+- documents and notifications for each employee
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
