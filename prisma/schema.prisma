@@ -1,0 +1,212 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id            String   @id @default(cuid())
+
+  employeeId    String   @unique
+  email         String   @unique
+  password      String
+
+  role          Role
+
+  isVerified    Boolean @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  profile        EmployeeProfile?
+
+  attendances    Attendance[]
+  leaveRequests  LeaveRequest[]
+  payrolls       Payroll[]
+  documents      Document[]
+
+  approvedLeaves LeaveRequest[] @relation("ApprovedBy")
+
+  notifications  Notification[]
+}
+model LeaveRequest {
+
+  id          String @id @default(cuid())
+
+  employeeId  String
+  employee    User @relation(fields:[employeeId],references:[id])
+
+  leaveType   LeaveType
+
+  startDate   DateTime
+
+  endDate     DateTime
+
+  reason      String
+
+  status      LeaveStatus @default(PENDING)
+
+  adminComment String?
+
+  approvedById String?
+  approvedBy   User? @relation("ApprovedBy",fields:[approvedById],references:[id])
+
+  createdAt DateTime @default(now())
+}
+model EmployeeProfile {
+
+  id              String @id @default(cuid())
+
+  userId          String @unique
+  user            User   @relation(fields:[userId],references:[id])
+
+  firstName       String
+  lastName        String
+
+  phone           String?
+  address         String?
+
+  gender          Gender?
+
+  dob             DateTime?
+
+  joiningDate     DateTime
+
+  designation     String
+
+  department      String
+
+  profileImage    String?
+
+  basicSalary     Decimal
+
+  bankName        String?
+  accountNumber   String?
+
+  emergencyName   String?
+  emergencyPhone  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attendance {
+
+  id          String @id @default(cuid())
+
+  employeeId  String
+  employee    User @relation(fields:[employeeId],references:[id])
+
+  date        DateTime
+
+  checkIn     DateTime?
+
+  checkOut    DateTime?
+
+  status      AttendanceStatus
+
+  remarks     String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([employeeId,date])
+}
+
+
+
+model Payroll {
+
+  id          String @id @default(cuid())
+
+  employeeId  String
+  employee    User @relation(fields:[employeeId],references:[id])
+
+  month       Int
+
+  year        Int
+
+  basic       Decimal
+
+  hra         Decimal
+
+  allowance   Decimal
+
+  deduction   Decimal
+
+  bonus       Decimal?
+
+  netSalary   Decimal
+
+  generatedAt DateTime @default(now())
+
+  @@unique([employeeId,month,year])
+}
+
+model Document {
+
+  id          String @id @default(cuid())
+
+  employeeId  String
+  employee    User @relation(fields:[employeeId],references:[id])
+
+  title       String
+
+  fileUrl     String
+
+  uploadedAt  DateTime @default(now())
+}
+
+model Notification {
+
+  id          String @id @default(cuid())
+
+  userId      String
+  user        User @relation(fields:[userId],references:[id])
+
+  title       String
+
+  message     String
+
+  isRead      Boolean @default(false)
+
+  createdAt   DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  LEAVE
+}
+
+enum LeaveType {
+  PAID
+  SICK
+  UNPAID
+}
