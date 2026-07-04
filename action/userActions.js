@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
 
-const userPaths = ["/employees", "/attendance", "/time-off", "/profile"];
+const userPaths = ["/portal/employees", "/portal/attendance", "/portal/time-off", "/portal/profile"];
 
 function revalidateUserRoutes() {
   userPaths.forEach((path) => revalidatePath(path));
@@ -51,7 +51,7 @@ export async function setCurrentEmployee(formData) {
   const cookieStore = await cookies();
   cookieStore.set("hrms-user-id", employee.id, { httpOnly: true, path: "/" });
   revalidateUserRoutes();
-  redirect(employee.role === "ADMIN" ? "/dashboard" : "/employees");
+  redirect(employee.role === "ADMIN" ? "/dashboard" : "/portal/employees");
 }
 
 export async function clearCurrentEmployee() {
